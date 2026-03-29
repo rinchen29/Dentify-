@@ -1,0 +1,171 @@
+1. 🧑‍💼 Product Manager Agent
+
+Responsibilities:
+- Interpret PRD and break into tasks
+- Define feature priorities (MVP → advanced)
+- Create task roadmap
+- Ensure alignment with product goals
+
+Output:
+- Task breakdown
+- Feature roadmap
+- Sprint planning
+
+---
+
+### 2. 🏗️ System Architect Agent
+
+Responsibilities:
+- Define system architecture
+- Design folder structure (Next.js)
+- Define API structure
+- Ensure scalability and maintainability
+
+Output:
+- Architecture decisions
+- Folder structure
+- Data flow diagrams (textual)
+
+---
+
+### 3. 🎨 Frontend Developer Agent
+
+Responsibilities:
+- Build UI using Next.js + Tailwind
+- Implement pages (public + dashboard)
+- Ensure responsive design
+- Follow component-based architecture
+
+Output:
+- React components
+- Pages and layouts
+- UI consistency
+
+---
+
+### 4. ⚙️ Backend Developer Agent
+
+Responsibilities:
+- Build API routes / server actions
+- Implement business logic
+- Handle validation and error handling
+- Integrate Prisma ORM
+
+Output:
+- API endpoints
+- Server-side logic
+- Data handling functions
+
+---
+
+### 5. 🗄️ Database Engineer Agent
+
+Responsibilities:
+- Design database schema
+- Create Prisma models
+- Optimize queries
+- Maintain data integrity
+
+Output:
+- Prisma schema
+- Relationships (Patient, Appointment, etc.)
+- Migration strategy
+
+---
+
+### 6. 🔐 Auth & Security Agent
+
+Responsibilities:
+- Implement authentication (Auth.js)
+- Role-based access control (Admin vs Public)
+- Secure API routes
+- Validate inputs
+
+Output:
+- Auth configuration
+- Middleware protection
+- Security rules
+
+---
+
+### 7. 🧪 QA / Testing Agent
+
+Responsibilities:
+- Test features and flows
+- Identify bugs
+- Suggest improvements
+- Validate user experience
+
+Output:
+- Test cases
+- Bug reports
+- Fix suggestions
+
+---
+
+### 8. 🚀 DevOps Agent
+
+Responsibilities:
+- Setup deployment (Vercel)
+- Manage environment variables
+- Optimize performance
+- Ensure CI/CD readiness
+
+Output:
+- Deployment steps
+- Config setup
+- Performance improvements
+
+---
+
+## 🔄 Collaboration Rules
+
+- Agents must communicate clearly and sequentially
+- Each agent must build on previous outputs
+- Avoid duplication of work
+- Follow the PRD and CLAUDE.md strictly
+- Keep code clean, modular, and production-ready
+
+---
+
+## 📋 Execution Workflow
+
+1. Product Manager → breaks down tasks  
+2. Architect → designs system  
+3. Database Engineer → defines schema  
+4. Backend → builds APIs  
+5. Frontend → builds UI  
+6. Auth Agent → secures system  
+7. QA → tests everything  
+8. DevOps → deploys and optimizes  
+
+---
+
+## 🧠 Constraints
+
+- Use only the defined tech stack
+- Prefer simplicity over complexity
+- Write production-quality code
+- Maintain consistent naming conventions
+- Avoid unnecessary libraries
+
+---
+
+## 🚀 Final Goal
+
+Deliver a fully functional Dentify platform with:
+- Public website
+- Appointment booking system
+- CRM dashboard
+- Secure authentication
+- Clean and scalable architecture
+
+---
+
+## 📌 Instruction
+
+Now:
+1. Instantiate all agents
+2. Assign roles clearly
+3. Start with Product Manager creating task breakdown for MVP
+4. Proceed step-by-step through the workflow

@@ -1,0 +1,151 @@
+# 🏗️ Tech Stack Document
+
+## Product: Dentify – Smart Dental CRM Platform
+
+---
+
+## 1. 📌 Overview
+
+This document defines the complete technology stack for building Dentify, a full-stack dental CRM platform using modern web technologies. The stack is designed to be scalable, maintainable, and optimized for performance.
+
+---
+
+## 2. 🌐 Architecture Overview
+
+Dentify follows a **full-stack monolithic architecture using Next.js**, where both frontend and backend are handled within a single framework.
+
+- Frontend: Next.js (React)
+- Backend: Next.js API Routes / Server Actions
+- Database: PostgreSQL / MongoDB
+- ORM: Prisma
+- Authentication: Auth.js (NextAuth)
+
+---
+
+## 3. 🎨 Frontend Stack
+
+### Core Framework
+- **Next.js (App Router)**
+  - Server-side rendering (SSR)
+  - Static site generation (SSG)
+  - Routing and layouts
+
+### UI Library
+- **React.js**
+  - Component-based architecture
+  - State management via hooks
+
+### Styling
+- **Tailwind CSS**
+  - Utility-first styling
+  - Responsive design
+
+### Forms & Validation
+- **React Hook Form**
+- **Zod (optional)**
+  - Schema validation
+
+### UI Components (Optional)
+- ShadCN UI / Headless UI
+- Lucide Icons
+
+---
+
+## 4. ⚙️ Backend Stack
+
+### Runtime
+- **Node.js (via Next.js)**
+
+### API Layer
+- Next.js API Routes
+- Server Actions (for direct server-side logic)
+
+### ORM
+- **Prisma**
+  - Type-safe database queries
+  - Easy schema management
+
+---
+
+## 5. 🗄️ Database
+
+### Option 1: PostgreSQL (Recommended)
+- Structured relational data
+- Best for CRM relationships
+
+### Option 2: MongoDB
+- Flexible schema
+- Faster prototyping
+
+---
+
+## 6. 🔐 Authentication & Authorization
+
+- **Auth.js (NextAuth.js)**
+  - Email/password login
+  - Session-based authentication
+  - JWT support
+
+### Roles:
+- Admin (CRM access)
+- Public user (no login required)
+
+---
+
+## 7. ☁️ Deployment & Hosting
+
+### Platform:
+- **Vercel**
+  - Optimized for Next.js
+  - Automatic deployments (CI/CD)
+
+### Database Hosting:
+- Neon (PostgreSQL)
+- MongoDB Atlas
+
+---
+
+## 8. 📦 State Management
+
+- React Hooks (useState, useReducer)
+- Context API (for global state)
+
+(Optional for scaling)
+- Zustand / Redux Toolkit
+
+---
+
+## 9. 📡 Communication & Integration
+
+### External Integrations:
+- WhatsApp API (click-to-chat)
+- Email services (Resend / Nodemailer)
+
+---
+
+## 10. 📊 Analytics & Monitoring
+
+- Google Analytics
+- Vercel Analytics
+- Logging via console / external tools
+
+---
+
+## 11. 🔐 Security Stack
+
+- Input validation (Zod)
+- Authentication middleware
+- HTTPS (via Vercel)
+- Environment variables (.env)
+
+---
+
+## 12. 🧪 Testing (Optional but Recommended)
+
+- Unit Testing: Jest
+- Component Testing: React Testing Library
+- E2E Testing: Playwright / Cypress
+
+---
+
+## 13. 📁 Project Structure (High-Level)

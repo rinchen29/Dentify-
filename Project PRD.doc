@@ -1,0 +1,255 @@
+# 🦷 Product Requirements Document (PRD)
+
+## Product Name: Dentify – Smart Dental CRM Platform
+
+---
+
+## 1. 📌 Product Overview
+
+Dentify is a full-stack web application built using Next.js that enables dental clinics to manage their digital presence and patient interactions through an integrated CRM (Customer Relationship Management) system.
+
+The platform serves two primary user groups:
+- Patients (Public Website Users)
+- Clinic/Admin (CRM Dashboard Users)
+
+---
+
+## 2. 🎯 Objectives
+
+- Build a scalable full-stack application using Next.js
+- Centralize patient and appointment data in a CRM
+- Enable seamless appointment booking
+- Improve clinic efficiency and patient experience
+
+---
+
+## 3. 👥 User Roles
+
+### 3.1 Patient (Public User)
+- Browse services
+- View dentist profile
+- Book appointments
+- Contact clinic
+
+### 3.2 Admin (Clinic User)
+- Manage appointments
+- Manage patient data
+- Manage services and content
+- View analytics
+
+---
+
+## 4. 🧩 Core Modules
+
+---
+
+### 4.1 🌐 Public Website (Frontend)
+
+**Features:**
+- Home Page
+- About Page
+- Services Pages
+- Blog/Articles
+- Contact Page
+- Appointment Booking
+
+**Tech:**
+- Next.js (App Router)
+- SEO optimized (SSR/SSG)
+
+---
+
+### 4.2 📅 Appointment System
+
+**Features:**
+- Service selection
+- Date & time slot booking
+- Patient information form
+- Data storage in database
+- Confirmation system
+
+**CRM Integration:**
+- Auto-create/update patient record
+- Assign appointment status
+
+---
+
+### 4.3 🧑‍⚕️ CRM Dashboard (Admin Panel)
+
+**Features:**
+- Secure login (Admin only)
+- Dashboard overview
+
+#### Sections:
+
+**1. Appointments Management**
+- View all bookings
+- Update status (Pending, Confirmed, Completed, Cancelled)
+
+**2. Patient Management**
+- Patient profiles
+- Visit history
+- Notes
+
+**3. Services Management**
+- Add/Edit/Delete services
+- Optional pricing
+
+**4. Content Management**
+- Blog posts
+- Testimonials
+- Gallery
+
+**5. Analytics**
+- Total bookings
+- Monthly performance
+- Popular services
+
+---
+
+### 4.4 💬 Communication System
+
+- WhatsApp integration
+- Email notifications (optional)
+- Appointment reminders (future scope)
+
+---
+
+## 5. 🗄️ Database Design (High-Level)
+
+### Users (Admin)
+- id
+- name
+- email
+- password
+
+### Patients
+- id
+- name
+- phone
+- email
+- history
+
+### Appointments
+- id
+- patient_id
+- service_id
+- date
+- time
+- status
+
+### Services
+- id
+- name
+- description
+- price
+
+### Testimonials
+- id
+- patient_name
+- review
+- rating
+
+### Blog Posts
+- id
+- title
+- content
+- created_at
+
+---
+
+## 6. 🏗️ Tech Stack
+
+### Frontend:
+- Next.js (App Router)
+- Tailwind CSS
+- React Hook Form
+
+### Backend:
+- Next.js API Routes / Server Actions
+
+### Database:
+- MongoDB or PostgreSQL
+- Prisma ORM (recommended)
+
+### Authentication:
+- NextAuth.js / Auth.js
+
+### Deployment:
+- Vercel
+
+---
+
+## 7. 🔐 Security Requirements
+
+- Secure authentication (JWT/session)
+- Input validation
+- Role-based access control
+- Data encryption (sensitive fields)
+
+---
+
+## 8. 📱 UI/UX Requirements
+
+- Mobile-first design
+- Clean and minimal interface
+- Fast loading (<2 seconds)
+- Easy navigation
+- Strong CTA buttons (Book Now)
+
+---
+
+## 9. 🔄 User Flow
+
+### Patient Flow:
+1. Visit website
+2. Browse services
+3. Click "Book Appointment"
+4. Fill form
+5. Submit
+6. Appointment stored in CRM
+
+---
+
+### Admin Flow:
+1. Login to dashboard
+2. View appointments
+3. Manage patients/services
+4. Update appointment status
+
+---
+
+## 10. 🚀 MVP Scope (Phase 1)
+
+- Public website
+- Appointment booking system
+- Basic CRM dashboard
+- Patient & appointment management
+
+---
+
+## 11. 🔮 Future Enhancements
+
+- AI chatbot
+- Online payments
+- Patient login dashboard
+- SMS/email reminders
+- Multi-language support
+- Advanced analytics
+
+---
+
+## 12. 📊 Success Metrics
+
+- Weekly bookings
+- Conversion rate (visitor → booking)
+- User engagement
+- CRM usage by admin
+
+---
+
+## 13. 🧠 Product Vision
+
+Dentify is not just a dental website, but a full-stack digital infrastructure that connects patient experience with clinic operations through a centralized CRM system.
+
+---
