@@ -1,38 +1,27 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
-  Sparkles,
-  Cpu,
-  AlignLeft,
-  Shield,
-  Wind,
-  Star,
-  ChevronRight,
-  ChevronLeft,
-  Check,
-  Calendar,
-  Clock,
-  User,
-  Phone,
-  Mail,
-  FileText,
+  Sparkles, Cpu, AlignLeft, Shield, Wind, Star, Stethoscope,
+  ChevronRight, ChevronLeft, Check,
+  Calendar, Clock, User, Phone, Mail, FileText, Loader2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface Service {
+interface ApiService {
   id: string
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
   name: string
-  description: string
+  description?: string
   duration: string
-  gradient: string
+  price?: number
+  isActive: boolean
 }
 
 interface BookingData {
-  service: string
+  serviceId: string
+  serviceName: string
   date: string
   time: string
   name: string
@@ -41,58 +30,24 @@ interface BookingData {
   notes: string
 }
 
-// ─── Data ────────────────────────────────────────────────────────────────────
+// ─── Icon map ────────────────────────────────────────────────────────────────
 
-const services: Service[] = [
-  {
-    id: 'whitening',
-    icon: Sparkles,
-    name: 'Teeth Whitening',
-    description: 'Professional whitening for a brighter smile',
-    duration: '60–90 min',
-    gradient: 'from-cyan-400 to-cyan-600',
-  },
-  {
-    id: 'implants',
-    icon: Cpu,
-    name: 'Dental Implants',
-    description: 'Permanent tooth replacement solution',
-    duration: 'Multiple visits',
-    gradient: 'from-violet-400 to-violet-600',
-  },
-  {
-    id: 'orthodontics',
-    icon: AlignLeft,
-    name: 'Orthodontics',
-    description: 'Straighter teeth with braces or aligners',
-    duration: '12–24 months',
-    gradient: 'from-cyan-500 to-violet-500',
-  },
-  {
-    id: 'rootcanal',
-    icon: Shield,
-    name: 'Root Canal',
-    description: 'Pain-free treatment to save your tooth',
-    duration: '60–120 min',
-    gradient: 'from-violet-500 to-cyan-500',
-  },
-  {
-    id: 'cleaning',
-    icon: Wind,
-    name: 'Dental Cleaning',
-    description: 'Professional cleaning and oral health check',
-    duration: '45–60 min',
-    gradient: 'from-cyan-400 to-cyan-600',
-  },
-  {
-    id: 'cosmetic',
-    icon: Star,
-    name: 'Cosmetic Dentistry',
-    description: 'Veneers, bonding, and smile makeovers',
-    duration: 'Varies',
-    gradient: 'from-violet-400 to-violet-600',
-  },
-]
+const iconMap: Record<string, { icon: React.ElementType; iconBg: string; iconColor: string }> = {
+  'whitening': { icon: Sparkles, iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
+  'implant':   { icon: Cpu,       iconBg: 'bg-blue-50',  iconColor: 'text-blue-700' },
+  'orthodon':  { icon: AlignLeft, iconBg: 'bg-teal-50',  iconColor: 'text-teal-600' },
+  'root':      { icon: Shield,    iconBg: 'bg-rose-50',  iconColor: 'text-rose-600' },
+  'cleaning':  { icon: Wind,      iconBg: 'bg-sky-50',   iconColor: 'text-sky-600' },
+  'cosmetic':  { icon: Star,      iconBg: 'bg-violet-50', iconColor: 'text-violet-600' },
+}
+
+function getServiceIcon(name: string) {
+  const lower = name.toLowerCase()
+  for (const [key, val] of Object.entries(iconMap)) {
+    if (lower.includes(key)) return val
+  }
+  return { icon: Stethoscope, iconBg: 'bg-slate-50', iconColor: 'text-slate-600' }
+}
 
 const timeSlots = [
   '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM',
@@ -124,43 +79,32 @@ function formatDateDisplay(dateStr: string): string {
   return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// ─── Progress Bar ─────────────────────────────────────────────────────────────
 
 function ProgressBar({ current }: { current: number }) {
   return (
-    <div className="mb-10">
+    <div className="mb-8">
       <div className="flex items-center justify-between relative">
-        {/* Connector line */}
-        <div className="absolute top-4 left-4 right-4 h-px bg-white/10 z-0" />
+        <div className="absolute top-4 left-4 right-4 h-px bg-slate-200 z-0" />
         <div
-          className="absolute top-4 left-4 h-px bg-gradient-to-r from-cyan-500 to-violet-500 z-0 transition-all duration-500"
+          className="absolute top-4 left-4 h-px bg-blue-900 z-0 transition-all duration-500"
           style={{ width: `${((current - 1) / (steps.length - 1)) * (100 - 8)}%` }}
         />
-
         {steps.map((step) => (
           <div key={step.number} className="relative z-10 flex flex-col items-center gap-2">
             <div
               className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300',
                 current > step.number
-                  ? 'bg-gradient-to-br from-cyan-400 to-violet-400 border-transparent text-white shadow-glow-cyan-sm'
+                  ? 'bg-blue-900 border-blue-900 text-white'
                   : current === step.number
-                  ? 'bg-[#0f172a] border-cyan-500 text-cyan-400'
-                  : 'bg-[#0f172a] border-white/10 text-slate-600'
+                  ? 'bg-white border-blue-900 text-blue-900'
+                  : 'bg-white border-slate-200 text-slate-400'
               )}
             >
-              {current > step.number ? (
-                <Check className="w-3.5 h-3.5" strokeWidth={3} />
-              ) : (
-                step.number
-              )}
+              {current > step.number ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : step.number}
             </div>
-            <span
-              className={cn(
-                'text-xs font-medium hidden sm:block',
-                current >= step.number ? 'text-white' : 'text-slate-600'
-              )}
-            >
+            <span className={cn('text-xs font-medium hidden sm:block', current >= step.number ? 'text-slate-900' : 'text-slate-400')}>
               {step.label}
             </span>
           </div>
@@ -170,63 +114,63 @@ function ProgressBar({ current }: { current: number }) {
   )
 }
 
-// ─── Step Components ─────────────────────────────────────────────────────────
+// ─── Step 1 ──────────────────────────────────────────────────────────────────
 
 function Step1Service({
-  selected,
-  onSelect,
+  services, loadingServices, selected, onSelect,
 }: {
+  services: ApiService[]
+  loadingServices: boolean
   selected: string
-  onSelect: (id: string) => void
+  onSelect: (id: string, name: string) => void
 }) {
+  if (loadingServices) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-700" />
+      </div>
+    )
+  }
+
   return (
     <div>
-      <h2 className="font-display text-2xl font-bold text-white mb-2">
-        Select Your Service
-      </h2>
-      <p className="text-slate-400 text-sm mb-6">
-        Choose the dental treatment you&apos;d like to book an appointment for.
-      </p>
+      <h2 className="font-display text-2xl font-bold text-slate-900 mb-1.5">Select Your Service</h2>
+      <p className="text-slate-500 text-sm mb-6">Choose the dental treatment you&apos;d like to book.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {services.map((service) => {
-          const Icon = service.icon
+          const { icon: Icon, iconBg, iconColor } = getServiceIcon(service.name)
           const isSelected = selected === service.id
           return (
             <button
               key={service.id}
-              onClick={() => onSelect(service.id)}
+              onClick={() => onSelect(service.id, service.name)}
               className={cn(
-                'relative flex items-start gap-4 p-4 rounded-2xl border text-left transition-all duration-200 group',
+                'relative flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200',
                 isSelected
-                  ? 'border-cyan-500/50 bg-cyan-500/10 shadow-glow-cyan-sm'
-                  : 'border-white/5 bg-white/3 hover:border-white/10 hover:bg-white/5'
+                  ? 'border-blue-900 bg-blue-50 shadow-sm'
+                  : 'border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/40'
               )}
             >
-              <div
-                className={cn(
-                  'w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0',
-                  service.gradient
-                )}
-              >
-                <Icon className="w-5 h-5 text-white" strokeWidth={2} />
+              <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
+                <Icon className={`w-5 h-5 ${iconColor}`} strokeWidth={2} />
               </div>
               <div className="flex-1 min-w-0">
-                <p
-                  className={cn(
-                    'font-semibold text-sm mb-0.5 transition-colors',
-                    isSelected ? 'text-cyan-300' : 'text-white'
-                  )}
-                >
+                <p className={cn('font-semibold text-sm mb-0.5', isSelected ? 'text-blue-900' : 'text-slate-900')}>
                   {service.name}
                 </p>
-                <p className="text-slate-500 text-xs leading-relaxed">{service.description}</p>
+                {service.description && (
+                  <p className="text-slate-400 text-xs leading-relaxed">{service.description}</p>
+                )}
                 <div className="flex items-center gap-1 mt-1.5">
-                  <Clock className="w-3 h-3 text-slate-600" />
-                  <span className="text-slate-600 text-xs">{service.duration}</span>
+                  <Clock className="w-3 h-3 text-slate-400" />
+                  <span className="text-slate-400 text-xs">{service.duration}</span>
+                  {service.price && (
+                    <span className="text-slate-400 text-xs ml-2">· ${service.price.toLocaleString()}</span>
+                  )}
                 </div>
               </div>
               {isSelected && (
-                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-violet-400 flex items-center justify-center">
+                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-900 flex items-center justify-center">
                   <Check className="w-3 h-3 text-white" strokeWidth={3} />
                 </div>
               )}
@@ -238,26 +182,19 @@ function Step1Service({
   )
 }
 
+// ─── Step 2 ──────────────────────────────────────────────────────────────────
+
 function Step2Schedule({
-  selectedDate,
-  selectedTime,
-  onDateSelect,
-  onTimeSelect,
+  selectedDate, selectedTime, onDateSelect, onTimeSelect,
 }: {
-  selectedDate: string
-  selectedTime: string
-  onDateSelect: (date: string) => void
-  onTimeSelect: (time: string) => void
+  selectedDate: string; selectedTime: string
+  onDateSelect: (date: string) => void; onTimeSelect: (time: string) => void
 }) {
   const today = new Date()
   const [viewYear, setViewYear] = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth())
 
-  const monthName = new Date(viewYear, viewMonth, 1).toLocaleString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  })
-
+  const monthName = new Date(viewYear, viewMonth, 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })
   const daysInMonth = getDaysInMonth(viewYear, viewMonth)
   const firstDay = getFirstDayOfMonth(viewYear, viewMonth)
 
@@ -269,28 +206,16 @@ function Step2Schedule({
   }, [firstDay, daysInMonth])
 
   const prevMonth = () => {
-    if (viewMonth === 0) {
-      setViewMonth(11)
-      setViewYear(viewYear - 1)
-    } else {
-      setViewMonth(viewMonth - 1)
-    }
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1) } else setViewMonth(viewMonth - 1)
   }
-
   const nextMonth = () => {
-    if (viewMonth === 11) {
-      setViewMonth(0)
-      setViewYear(viewYear + 1)
-    } else {
-      setViewMonth(viewMonth + 1)
-    }
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1) } else setViewMonth(viewMonth + 1)
   }
 
   const isDateDisabled = (day: number) => {
     const d = new Date(viewYear, viewMonth, day)
-    const t = new Date()
-    t.setHours(0, 0, 0, 0)
-    return d < t || d.getDay() === 0 // disable past dates and Sundays
+    const t = new Date(); t.setHours(0, 0, 0, 0)
+    return d < t || d.getDay() === 0
   }
 
   const formatDate = (day: number) => {
@@ -301,50 +226,30 @@ function Step2Schedule({
 
   return (
     <div>
-      <h2 className="font-display text-2xl font-bold text-white mb-2">
-        Choose Date &amp; Time
-      </h2>
-      <p className="text-slate-400 text-sm mb-6">
-        Select your preferred appointment date and time slot.
-      </p>
+      <h2 className="font-display text-2xl font-bold text-slate-900 mb-1.5">Choose Date &amp; Time</h2>
+      <p className="text-slate-500 text-sm mb-6">Select your preferred appointment date and time.</p>
 
-      {/* Calendar */}
-      <div className="glass rounded-2xl p-5 border border-white/5 mb-5">
-        {/* Month Nav */}
+      <div className="card p-5 mb-5">
         <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={prevMonth}
-            className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-white transition-all"
-          >
+          <button onClick={prevMonth} className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-all">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-white font-semibold text-sm">{monthName}</span>
-          <button
-            onClick={nextMonth}
-            className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center text-slate-400 hover:text-white transition-all"
-          >
+          <span className="text-slate-900 font-semibold text-sm">{monthName}</span>
+          <button onClick={nextMonth} className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-all">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-
-        {/* Day headers */}
         <div className="grid grid-cols-7 mb-2">
           {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
-            <div key={d} className="text-center text-slate-600 text-xs py-1 font-medium">
-              {d}
-            </div>
+            <div key={d} className="text-center text-slate-400 text-xs py-1 font-medium">{d}</div>
           ))}
         </div>
-
-        {/* Days */}
         <div className="grid grid-cols-7 gap-1">
           {calendarDays.map((day, i) => {
             if (day === null) return <div key={`empty-${i}`} />
-
             const dateStr = formatDate(day)
             const disabled = isDateDisabled(day)
             const isSelected = selectedDate === dateStr
-
             return (
               <button
                 key={dateStr}
@@ -353,10 +258,10 @@ function Step2Schedule({
                 className={cn(
                   'aspect-square rounded-lg text-xs font-medium flex items-center justify-center transition-all duration-150',
                   disabled
-                    ? 'text-slate-700 cursor-not-allowed'
+                    ? 'text-slate-300 cursor-not-allowed'
                     : isSelected
-                    ? 'bg-gradient-to-br from-cyan-500 to-violet-500 text-white shadow-glow-cyan-sm'
-                    : 'text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer'
+                    ? 'bg-blue-900 text-white shadow-sm'
+                    : 'text-slate-700 hover:bg-blue-50 hover:text-blue-900 cursor-pointer'
                 )}
               >
                 {day}
@@ -366,10 +271,9 @@ function Step2Schedule({
         </div>
       </div>
 
-      {/* Time Slots */}
       <div>
-        <p className="text-slate-300 text-sm font-medium mb-3 flex items-center gap-2">
-          <Clock className="w-4 h-4 text-cyan-400" />
+        <p className="text-slate-700 text-sm font-semibold mb-3 flex items-center gap-2">
+          <Clock className="w-4 h-4 text-teal-600" />
           Available Time Slots
         </p>
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -380,8 +284,8 @@ function Step2Schedule({
               className={cn(
                 'px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150 border',
                 selectedTime === slot
-                  ? 'bg-gradient-to-br from-cyan-500 to-violet-500 border-transparent text-white shadow-glow-cyan-sm'
-                  : 'bg-white/3 border-white/5 text-slate-400 hover:bg-white/5 hover:text-white hover:border-white/10'
+                  ? 'bg-blue-900 border-blue-900 text-white shadow-sm'
+                  : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-900 hover:bg-blue-50'
               )}
             >
               {slot}
@@ -393,148 +297,93 @@ function Step2Schedule({
   )
 }
 
+// ─── Step 3 ──────────────────────────────────────────────────────────────────
+
 function Step3Details({
-  data,
-  onChange,
+  data, onChange,
 }: {
   data: Pick<BookingData, 'name' | 'email' | 'phone' | 'notes'>
   onChange: (field: keyof BookingData, value: string) => void
 }) {
   const inputClass =
-    'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all duration-200 text-sm'
+    'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all duration-200 text-sm'
 
   return (
     <div>
-      <h2 className="font-display text-2xl font-bold text-white mb-2">
-        Your Information
-      </h2>
-      <p className="text-slate-400 text-sm mb-6">
-        We&apos;ll use these details to confirm your appointment and send reminders.
-      </p>
+      <h2 className="font-display text-2xl font-bold text-slate-900 mb-1.5">Your Information</h2>
+      <p className="text-slate-500 text-sm mb-6">We&apos;ll use these details to confirm your appointment.</p>
 
       <div className="space-y-4">
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
-            <User className="w-3.5 h-3.5 text-cyan-400" />
-            Full Name <span className="text-rose-400">*</span>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-1.5">
+            <User className="w-3.5 h-3.5 text-blue-700" />
+            Full Name <span className="text-rose-500">*</span>
           </label>
-          <input
-            type="text"
-            required
-            value={data.name}
-            onChange={(e) => onChange('name', e.target.value)}
-            placeholder="John Smith"
-            className={inputClass}
-          />
+          <input type="text" required value={data.name} onChange={(e) => onChange('name', e.target.value)} placeholder="John Smith" className={inputClass} />
         </div>
-
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
-            <Mail className="w-3.5 h-3.5 text-cyan-400" />
-            Email Address <span className="text-rose-400">*</span>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-1.5">
+            <Mail className="w-3.5 h-3.5 text-blue-700" />
+            Email Address <span className="text-rose-500">*</span>
           </label>
-          <input
-            type="email"
-            required
-            value={data.email}
-            onChange={(e) => onChange('email', e.target.value)}
-            placeholder="john@example.com"
-            className={inputClass}
-          />
+          <input type="email" required value={data.email} onChange={(e) => onChange('email', e.target.value)} placeholder="john@example.com" className={inputClass} />
         </div>
-
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
-            <Phone className="w-3.5 h-3.5 text-cyan-400" />
-            Phone Number <span className="text-rose-400">*</span>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-1.5">
+            <Phone className="w-3.5 h-3.5 text-blue-700" />
+            Phone Number <span className="text-rose-500">*</span>
           </label>
-          <input
-            type="tel"
-            required
-            value={data.phone}
-            onChange={(e) => onChange('phone', e.target.value)}
-            placeholder="+1 (555) 000-0000"
-            className={inputClass}
-          />
+          <input type="tel" required value={data.phone} onChange={(e) => onChange('phone', e.target.value)} placeholder="+1 (555) 000-0000" className={inputClass} />
         </div>
-
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
-            <FileText className="w-3.5 h-3.5 text-cyan-400" />
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-1.5">
+            <FileText className="w-3.5 h-3.5 text-blue-700" />
             Additional Notes
           </label>
-          <textarea
-            rows={3}
-            value={data.notes}
-            onChange={(e) => onChange('notes', e.target.value)}
-            placeholder="Any allergies, concerns, or special requests..."
-            className={`${inputClass} resize-none`}
-          />
+          <textarea rows={3} value={data.notes} onChange={(e) => onChange('notes', e.target.value)} placeholder="Any allergies, concerns, or special requests..." className={`${inputClass} resize-none`} />
         </div>
       </div>
     </div>
   )
 }
 
-function Step4Confirmation({
-  data,
-  onReset,
-}: {
-  data: BookingData
-  onReset: () => void
-}) {
-  const serviceName = services.find((s) => s.id === data.service)?.name ?? data.service
+// ─── Step 4 ──────────────────────────────────────────────────────────────────
 
+function Step4Confirmation({ data, onReset }: { data: BookingData; onReset: () => void }) {
   return (
     <div className="text-center">
-      {/* Animated checkmark */}
-      <div className="relative inline-flex mb-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-violet-400/20 blur-xl rounded-full scale-150" />
-        <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center shadow-glow-cyan mx-auto">
-          <Check className="w-10 h-10 text-white" strokeWidth={2.5} />
-        </div>
+      <div className="w-20 h-20 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-5">
+        <Check className="w-10 h-10 text-teal-600" strokeWidth={2.5} />
       </div>
-
-      <h2 className="font-display text-3xl font-bold text-white mb-2">
-        Booking Confirmed!
-      </h2>
-      <p className="text-slate-400 text-sm mb-8 max-w-sm mx-auto">
-        Your appointment has been successfully booked. We&apos;ve sent a confirmation
-        to <span className="text-cyan-400">{data.email}</span>.
+      <h2 className="font-display text-3xl font-bold text-slate-900 mb-2">Booking Confirmed!</h2>
+      <p className="text-slate-500 text-sm mb-8 max-w-sm mx-auto">
+        Your appointment has been successfully booked. We&apos;ll be in touch at{' '}
+        <span className="text-blue-700 font-medium">{data.email}</span>.
       </p>
-
-      {/* Summary Card */}
-      <div className="glass rounded-2xl p-6 border border-white/10 text-left max-w-md mx-auto mb-6">
-        <h3 className="text-white font-semibold text-sm uppercase tracking-widest mb-4">
-          Booking Summary
-        </h3>
+      <div className="card p-6 text-left max-w-md mx-auto mb-6">
+        <h3 className="text-slate-700 font-bold text-xs uppercase tracking-widest mb-4">Booking Summary</h3>
         <div className="space-y-3">
           {[
-            { label: 'Service', value: serviceName },
+            { label: 'Service', value: data.serviceName },
             { label: 'Date', value: formatDateDisplay(data.date) },
             { label: 'Time', value: data.time },
             { label: 'Patient', value: data.name },
             { label: 'Email', value: data.email },
             { label: 'Phone', value: data.phone },
           ].map(({ label, value }) => (
-            <div key={label} className="flex items-start justify-between gap-4">
-              <span className="text-slate-500 text-xs uppercase tracking-wide shrink-0">
-                {label}
-              </span>
-              <span className="text-white text-sm text-right">{value}</span>
+            <div key={label} className="flex items-start justify-between gap-4 pb-2 border-b border-slate-50 last:border-0 last:pb-0">
+              <span className="text-slate-400 text-xs uppercase tracking-wide shrink-0">{label}</span>
+              <span className="text-slate-900 text-sm text-right font-medium">{value}</span>
             </div>
           ))}
         </div>
       </div>
-
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <a href="/" className="btn-primary text-sm">
+        <a href="/" className="btn-primary">
           Back to Home
           <ChevronRight className="w-4 h-4" />
         </a>
-        <button onClick={onReset} className="btn-ghost text-sm">
-          Book Another
-        </button>
+        <button onClick={onReset} className="btn-outline">Book Another</button>
       </div>
     </div>
   )
@@ -545,146 +394,164 @@ function Step4Confirmation({
 export default function BookPage() {
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  const [apiServices, setApiServices] = useState<ApiService[]>([])
+  const [loadingServices, setLoadingServices] = useState(true)
+
   const [booking, setBooking] = useState<BookingData>({
-    service: '',
-    date: '',
-    time: '',
-    name: '',
-    email: '',
-    phone: '',
-    notes: '',
+    serviceId: '', serviceName: '', date: '', time: '',
+    name: '', email: '', phone: '', notes: '',
   })
+
+  useEffect(() => {
+    fetch('/api/services')
+      .then((r) => r.json())
+      .then((data) => setApiServices((data.services ?? []).filter((s: ApiService) => s.isActive)))
+      .catch(() => setApiServices([]))
+      .finally(() => setLoadingServices(false))
+  }, [])
 
   const updateField = (field: keyof BookingData, value: string) => {
     setBooking((prev) => ({ ...prev, [field]: value }))
   }
 
+  const selectService = (id: string, name: string) => {
+    setBooking((prev) => ({ ...prev, serviceId: id, serviceName: name }))
+  }
+
   const canProceed = (): boolean => {
     switch (step) {
-      case 1:
-        return booking.service !== ''
-      case 2:
-        return booking.date !== '' && booking.time !== ''
-      case 3:
-        return (
-          booking.name.trim() !== '' &&
-          booking.email.trim() !== '' &&
-          booking.phone.trim() !== ''
-        )
-      default:
-        return true
+      case 1: return booking.serviceId !== ''
+      case 2: return booking.date !== '' && booking.time !== ''
+      case 3: return booking.name.trim() !== '' && booking.email.trim() !== '' && booking.phone.trim() !== ''
+      default: return true
     }
   }
 
-  const handleNext = () => {
-    if (step === 3) {
+  const handleNext = async () => {
+    if (step < 3) { setStep(step + 1); return }
+
+    // Step 3 → submit to API
+    setSubmitting(true)
+    setSubmitError('')
+    try {
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceId: booking.serviceId,
+          date: booking.date,
+          time: booking.time,
+          patientName: booking.name,
+          patientEmail: booking.email,
+          patientPhone: booking.phone,
+          notes: booking.notes || undefined,
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'Failed to book appointment. Please try again.')
+      }
+
       setSubmitted(true)
       setStep(4)
-    } else {
-      setStep(step + 1)
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Something went wrong.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
   const handleReset = () => {
     setStep(1)
     setSubmitted(false)
-    setBooking({
-      service: '',
-      date: '',
-      time: '',
-      name: '',
-      email: '',
-      phone: '',
-      notes: '',
-    })
+    setSubmitError('')
+    setBooking({ serviceId: '', serviceName: '', date: '', time: '', name: '', email: '', phone: '', notes: '' })
   }
 
   return (
-    <main className="bg-[#030712] min-h-screen">
+    <main className="bg-white min-h-screen">
+
       {/* Hero */}
-      <section className="relative pt-32 pb-8 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-[20%] w-60 h-60 bg-cyan-500/10 rounded-full blur-[80px]" />
-          <div className="absolute top-0 right-[20%] w-60 h-60 bg-violet-500/10 rounded-full blur-[80px]" />
+      <section className="relative pt-32 pb-10 overflow-hidden bg-surface">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-20 -right-24 w-80 h-80 rounded-full bg-blue-100 opacity-40" />
+          <div className="absolute -bottom-16 -left-20 w-72 h-72 rounded-full bg-teal-50 opacity-50" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="section-badge mb-4 mx-auto">
             <Calendar className="w-3.5 h-3.5" />
             Online Booking
           </div>
-          <h1 className="font-display text-4xl lg:text-5xl font-bold text-white mb-3">
+          <h1 className="font-display text-4xl lg:text-5xl font-bold text-slate-900 mb-3">
             Book Your{' '}
-            <span className="gradient-text">Appointment</span>
+            <span className="text-blue-900">Appointment</span>
           </h1>
-          <p className="text-slate-400 max-w-xl mx-auto">
+          <p className="text-slate-500 max-w-xl mx-auto">
             Schedule your visit in under 2 minutes. Choose your service, pick a time, and you&apos;re done.
           </p>
         </div>
       </section>
 
       {/* Form */}
-      <section className="py-8 pb-24">
+      <section className="py-10 pb-24 bg-white">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Stepper */}
           {!submitted && <ProgressBar current={step} />}
 
-          {/* Card */}
-          <div className="glass rounded-3xl p-6 lg:p-8 border border-white/10 shadow-2xl">
+          <div className="card p-6 lg:p-8 shadow-sm">
             {step === 1 && (
               <Step1Service
-                selected={booking.service}
-                onSelect={(id) => updateField('service', id)}
+                services={apiServices}
+                loadingServices={loadingServices}
+                selected={booking.serviceId}
+                onSelect={selectService}
               />
             )}
             {step === 2 && (
               <Step2Schedule
-                selectedDate={booking.date}
-                selectedTime={booking.time}
-                onDateSelect={(d) => updateField('date', d)}
-                onTimeSelect={(t) => updateField('time', t)}
+                selectedDate={booking.date} selectedTime={booking.time}
+                onDateSelect={(d) => updateField('date', d)} onTimeSelect={(t) => updateField('time', t)}
               />
             )}
             {step === 3 && (
               <Step3Details
-                data={{
-                  name: booking.name,
-                  email: booking.email,
-                  phone: booking.phone,
-                  notes: booking.notes,
-                }}
+                data={{ name: booking.name, email: booking.email, phone: booking.phone, notes: booking.notes }}
                 onChange={updateField}
               />
             )}
             {step === 4 && submitted && <Step4Confirmation data={booking} onReset={handleReset} />}
 
+            {/* Error message */}
+            {submitError && (
+              <div className="mt-4 px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+                {submitError}
+              </div>
+            )}
+
             {/* Navigation */}
             {step < 4 && (
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
+              <div className="flex items-center justify-between mt-8 pt-5 border-t border-slate-100">
                 <button
                   onClick={() => setStep(Math.max(1, step - 1))}
                   disabled={step === 1}
                   className={cn(
-                    'flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
-                    step === 1
-                      ? 'text-slate-700 cursor-not-allowed'
-                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all',
+                    step === 1 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                   )}
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Back
                 </button>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   {[1, 2, 3].map((s) => (
                     <div
                       key={s}
                       className={cn(
                         'rounded-full transition-all duration-300',
-                        s === step
-                          ? 'w-6 h-2 bg-gradient-to-r from-cyan-500 to-violet-500'
-                          : s < step
-                          ? 'w-2 h-2 bg-cyan-500/50'
-                          : 'w-2 h-2 bg-white/10'
+                        s === step ? 'w-6 h-2 bg-blue-900' : s < step ? 'w-2 h-2 bg-blue-300' : 'w-2 h-2 bg-slate-200'
                       )}
                     />
                   ))}
@@ -692,20 +559,21 @@ export default function BookPage() {
 
                 <button
                   onClick={handleNext}
-                  disabled={!canProceed()}
-                  className={cn(
-                    'btn-primary text-sm',
-                    !canProceed() && 'opacity-40 cursor-not-allowed hover:scale-100 hover:shadow-none'
-                  )}
+                  disabled={!canProceed() || submitting}
+                  className={cn('btn-primary text-sm', (!canProceed() || submitting) && 'opacity-40 cursor-not-allowed hover:transform-none hover:shadow-none')}
                 >
-                  {step === 3 ? 'Confirm Booking' : 'Continue'}
-                  <ChevronRight className="w-4 h-4" />
+                  {submitting ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Booking...</>
+                  ) : (
+                    <>{step === 3 ? 'Confirm Booking' : 'Continue'}<ChevronRight className="w-4 h-4" /></>
+                  )}
                 </button>
               </div>
             )}
           </div>
         </div>
       </section>
+
     </main>
   )
 }

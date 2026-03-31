@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Smile, Menu, X, ChevronRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { usePathname } from 'next/navigation'
+import { Menu, X, Phone } from 'lucide-react'
+import { useSiteConfig } from '@/lib/SiteConfigContext'
 
 const navLinks = [
-  { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/services', label: 'Services' },
   { href: '/contact', label: 'Contact' },
@@ -15,115 +15,128 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = usePathname()
+  const config = useSiteConfig()
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 24)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Close mobile menu on resize to desktop
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setMobileOpen(false)
-      }
-    }
+    const handleResize = () => { if (window.innerWidth >= 768) setMobileOpen(false) }
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  useEffect(() => { setMobileOpen(false) }, [pathname])
+
+  const phoneHref = `tel:${config.phone.replace(/\s+/g, '')}`
+
   return (
     <header
-      className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'backdrop-blur-xl bg-[#030712]/80 border-b border-white/5 shadow-lg shadow-black/20'
-          : 'bg-transparent'
-      )}
+          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100'
+          : 'bg-white/80 backdrop-blur-sm'
+      }`}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-16 lg:h-[4.5rem]">
+
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md group-hover:bg-cyan-500/30 transition-colors duration-300" />
-              <div className="relative bg-gradient-to-br from-cyan-400 to-cyan-600 p-1.5 rounded-full">
-                <Smile className="w-5 h-5 text-white" strokeWidth={2.5} />
+          <Link href="/" className="flex items-center gap-2.5">
+            {config.logoUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={config.logoUrl} alt={config.clinicName} className="w-8 h-8 rounded-xl object-cover" />
+            ) : (
+              <div className="w-8 h-8 rounded-xl bg-blue-900 flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" className="w-4.5 h-4.5 fill-white" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C9 2 7 4 7 6c0 1 .3 2 .8 3L6 19c0 1.1.9 2 2 2 .8 0 1.5-.5 1.8-1.2L12 14l2.2 5.8c.3.7 1 1.2 1.8 1.2 1.1 0 2-.9 2-2l-1.8-10c.5-1 .8-2 .8-3 0-2-2-4-5-4z" />
+                </svg>
               </div>
-            </div>
-            <span className="text-xl font-bold tracking-tight">
-              <span className="text-white font-display">Denti</span>
-              <span className="gradient-text font-display font-black">fy</span>
+            )}
+            <span className="font-display font-bold text-xl text-blue-900 tracking-tight">
+              {config.clinicName}
             </span>
           </Link>
 
-          {/* Desktop Nav Links */}
+          {/* Desktop Nav */}
           <ul className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="relative px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors duration-200 group"
-                >
-                  {link.label}
-                  <span className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-cyan-500 to-violet-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-                </Link>
-              </li>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-900'
+                        : 'text-slate-600 hover:text-blue-900 hover:bg-blue-50'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              )
+            })}
           </ul>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-3">
-            <Link
-              href="/book"
-              className="btn-primary text-sm py-2.5 px-5 group"
+          {/* Desktop right */}
+          <div className="hidden md:flex items-center gap-4">
+            <a
+              href={phoneHref}
+              className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-900 transition-colors"
             >
-              Book Appointment
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              <Phone className="w-3.5 h-3.5" />
+              {config.phone}
+            </a>
+            <Link href="/book" className="btn-primary text-sm py-2 px-5">
+              Book Now
             </Link>
           </div>
 
-          {/* Mobile Hamburger */}
+          {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden relative z-50 p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200"
+            className="md:hidden p-2 rounded-lg text-slate-600 hover:text-blue-900 hover:bg-blue-50 transition-colors"
             aria-label="Toggle menu"
           >
-            {mobileOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden animate-slide-down">
-          <div className="glass-dark border-t border-white/5 px-4 py-4 space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-between px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200 group"
-              >
-                <span className="font-medium">{link.label}</span>
-                <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-            ))}
-            <div className="pt-2">
-              <Link
-                href="/book"
-                onClick={() => setMobileOpen(false)}
-                className="btn-primary w-full justify-center text-sm"
-              >
+        <div className="md:hidden bg-white border-t border-slate-100 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-blue-50 text-blue-900'
+                      : 'text-slate-600 hover:bg-blue-50 hover:text-blue-900'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
+            <div className="pt-2 border-t border-slate-100">
+              <a href={phoneHref} className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600">
+                <Phone className="w-3.5 h-3.5" />
+                {config.phone}
+              </a>
+            </div>
+            <div className="pt-1">
+              <Link href="/book" className="btn-primary text-sm w-full justify-center">
                 Book Appointment
-                <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

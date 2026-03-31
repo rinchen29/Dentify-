@@ -1,3 +1,5 @@
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import Hero from '@/components/home/Hero'
 import Stats from '@/components/home/Stats'
 import Services from '@/components/home/Services'
@@ -8,14 +10,18 @@ import CtaBanner from '@/components/home/CtaBanner'
 
 export default function HomePage() {
   return (
-    <main>
-      <Hero />
-      <Stats />
-      <Services />
-      <WhyUs />
-      <Process />
-      <Testimonials />
-      <CtaBanner />
-    </main>
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <Stats />
+        <Services />
+        <WhyUs />
+        <Process />
+        <Testimonials />
+        <CtaBanner />
+      </main>
+      <Footer />
+    </>
   )
 }

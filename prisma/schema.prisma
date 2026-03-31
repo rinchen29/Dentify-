@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  role          Role      @default(ADMIN)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─── CRM Models ───────────────────────────────────────────────────────────────
+
+model Patient {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String
+  dateOfBirth  DateTime?
+  address      String?
+  notes        String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  appointments Appointment[]
+
+  @@map("patients")
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  icon        String?
+  tagline     String?
+  description String?  @db.Text
+  includes    String[]
+  duration    String
+  price       Float?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  appointments Appointment[]
+
+  @@map("services")
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  patientId String
+  serviceId String
+  date      DateTime
+  time      String
+  status    AppointmentStatus @default(PENDING)
+  notes     String?           @db.Text
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id])
+
+  @@map("appointments")
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  designation String
+  imageUrl    String?  @db.Text
+  experience  String?
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("team_members")
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String        @db.Text
+  status    MessageStatus @default(UNREAD)
+  createdAt DateTime      @default(now())
+
+  @@map("contact_messages")
+}
+
+model SiteConfig {
+  id         String  @id @default(cuid())
+  clinicName String  @default("Dentify")
+  tagline    String  @default("Your Smile Deserves the Best Care")
+  phone      String  @default("+91 98765 43210")
+  whatsapp   String  @default("919876543210")
+  email      String  @default("hello@dentify.com")
+  address    String  @default("B-12, Sector 18, Noida")
+  city       String  @default("Uttar Pradesh 201301")
+  logoUrl    String?
+
+  @@map("site_config")
+}
+
+model Stat {
+  id          String  @id @default(cuid())
+  label       String
+  description String
+  value       Int
+  suffix      String
+  decimal     Boolean @default(false)
+  icon        String
+  iconBg      String
+  iconColor   String
+  numColor    String
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+
+  @@map("stats")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum MessageStatus {
+  UNREAD
+  READ
+  REPLIED
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}

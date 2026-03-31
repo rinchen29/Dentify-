@@ -1,44 +1,29 @@
 import type { Metadata } from 'next'
-import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import './globals.css'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
+import SessionProvider from '@/components/SessionProvider'
+import { SiteConfigProvider } from '@/lib/SiteConfigContext'
 
-const playfairDisplay = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  variable: '--font-display',
-  display: 'swap',
-})
-
-const plusJakartaSans = Plus_Jakarta_Sans({
+const poppins = Poppins({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-sans',
+  variable: '--font-poppins',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'Dentify – Smart Dental Care',
+  title: 'Dentify — Modern Dental Care',
   description:
-    'Dentify is a premium dental CRM platform offering advanced dental services, seamless appointment booking, and exceptional patient care.',
+    'Premium dental care with cutting-edge technology and a compassionate team. Book your appointment today.',
   keywords: [
     'dental care',
     'dentist',
     'teeth whitening',
     'dental implants',
     'orthodontics',
-    'root canal',
     'cosmetic dentistry',
     'dental clinic',
-    'appointment booking',
   ],
-  openGraph: {
-    title: 'Dentify – Smart Dental Care',
-    description:
-      'Premium dental services with cutting-edge technology. Book your appointment today.',
-    type: 'website',
-  },
 }
 
 export default function RootLayout({
@@ -47,14 +32,13 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${playfairDisplay.variable} ${plusJakartaSans.variable}`}
-    >
-      <body className="bg-[#030712] text-white font-sans antialiased">
-        <Navbar />
-        {children}
-        <Footer />
+    <html lang="en" className={poppins.variable}>
+      <body className="bg-white text-slate-800 font-sans antialiased">
+        <SessionProvider>
+          <SiteConfigProvider>
+            {children}
+          </SiteConfigProvider>
+        </SessionProvider>
       </body>
     </html>
   )

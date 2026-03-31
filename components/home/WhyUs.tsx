@@ -1,13 +1,13 @@
 'use client'
 
-import { Check, Zap, Heart } from 'lucide-react'
+import { Check, Zap, Heart, Clock, Microscope } from 'lucide-react'
 import { useAnimateOnScroll } from '@/hooks/useAnimateOnScroll'
 
 const features = [
-  'State-of-the-art Equipment',
-  'Pain-Free Procedures',
-  'Expert Dental Team',
-  'Flexible Appointment Scheduling',
+  'State-of-the-art Equipment & Technology',
+  'Pain-Free Procedures & Gentle Care',
+  'Expert & Experienced Dental Team',
+  'Flexible Scheduling & Same-Day Appointments',
 ]
 
 const cards = [
@@ -15,17 +15,28 @@ const cards = [
     icon: Zap,
     title: 'Advanced Technology',
     description:
-      'We invest in the latest dental technology — from 3D imaging to laser treatments — to deliver faster, more precise, and more comfortable care.',
-    gradient: 'from-cyan-400 to-cyan-600',
-    glow: 'cyan',
+      'We invest in the latest dental technology — from 3D imaging to laser treatments — for faster, more precise, and more comfortable care.',
+    iconBg: 'bg-blue-50',
+    iconColor: 'text-blue-700',
+    border: 'hover:border-blue-200',
   },
   {
     icon: Heart,
     title: 'Patient-First Approach',
     description:
-      'Every decision we make centers on your comfort, health, and confidence. We listen, we explain, and we treat you like family.',
-    gradient: 'from-violet-400 to-violet-600',
-    glow: 'violet',
+      'Every decision we make centers on your comfort, health, and confidence. We listen, explain, and treat every patient like family.',
+    iconBg: 'bg-rose-50',
+    iconColor: 'text-rose-600',
+    border: 'hover:border-rose-200',
+  },
+  {
+    icon: Microscope,
+    title: 'Evidence-Based Dentistry',
+    description:
+      'All our treatments follow the latest clinical guidelines and research. You receive proven, effective care grounded in science.',
+    iconBg: 'bg-teal-50',
+    iconColor: 'text-teal-600',
+    border: 'hover:border-teal-200',
   },
 ]
 
@@ -33,103 +44,83 @@ export default function WhyUs() {
   const sectionRef = useAnimateOnScroll<HTMLElement>({ threshold: 0.05 })
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative py-20 lg:py-28 bg-[#030712] overflow-hidden"
-    >
-      {/* Background accent */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-violet-500/5 blur-[100px] rounded-full" />
-        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-cyan-500/5 blur-[100px] rounded-full" />
-      </div>
+    <section ref={sectionRef} className="py-20 lg:py-28 bg-surface-teal overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Column */}
+          {/* Left */}
           <div className="animate-on-scroll">
-            <div className="section-badge mb-4">
-              Why Us
-            </div>
-            <h2 className="font-display text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
-              Why Choose{' '}
-              <span className="gradient-text">Dentify</span>
+            <div className="section-badge-teal mb-4">Why Choose Us</div>
+            <h2 className="font-display text-4xl lg:text-5xl font-bold text-slate-900 mb-5 leading-tight">
+              Why Patients Choose{' '}
+              <span className="text-teal-600">Dentify</span>
             </h2>
-            <p className="text-slate-400 text-lg leading-relaxed mb-10">
+            <p className="text-slate-600 text-lg leading-relaxed mb-10">
               We combine clinical excellence with a warm, welcoming environment.
               When you choose Dentify, you&apos;re choosing a team that genuinely
-              cares about every aspect of your oral health journey.
+              cares about every step of your oral health journey.
             </p>
 
-            {/* Feature List */}
+            {/* Feature list */}
             <ul className="space-y-4">
               {features.map((feature, index) => (
                 <li
                   key={feature}
                   className="flex items-center gap-4 animate-on-scroll"
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  style={{ animationDelay: `${index * 80}ms` }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-violet-400 flex items-center justify-center shrink-0 shadow-glow-cyan-sm">
-                    <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
+                  <div className="w-7 h-7 rounded-full bg-teal-100 border border-teal-200 flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 text-teal-700" strokeWidth={2.5} />
                   </div>
-                  <span className="text-slate-200 font-medium">{feature}</span>
+                  <span className="text-slate-700 font-medium text-sm">{feature}</span>
                 </li>
               ))}
             </ul>
-          </div>
 
-          {/* Right Column */}
-          <div className="relative animate-on-scroll" style={{ animationDelay: '200ms' }}>
-            {/* Blurred orb behind cards */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 blur-3xl rounded-full" />
-            </div>
-
-            <div className="relative space-y-4">
-              {cards.map((card, index) => {
-                const Icon = card.icon
-                return (
-                  <div
-                    key={card.title}
-                    className="glass rounded-2xl p-6 border border-white/5 group hover:-translate-y-1 transition-transform duration-300"
-                    style={{ animationDelay: `${(index + 1) * 150}ms` }}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div
-                        className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.gradient} flex items-center justify-center shrink-0 shadow-lg`}
-                      >
-                        <Icon className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-display text-lg font-bold text-white mb-1.5">
-                          {card.title}
-                        </h3>
-                        <p className="text-slate-400 text-sm leading-relaxed">
-                          {card.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Hover glow border */}
-                    <div
-                      className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
-                        card.glow === 'cyan'
-                          ? 'shadow-[inset_0_0_0_1px_rgba(6,182,212,0.2)]'
-                          : 'shadow-[inset_0_0_0_1px_rgba(139,92,246,0.2)]'
-                      }`}
-                    />
-                  </div>
-                )
-              })}
-
-              {/* Decorative badge */}
-              <div className="absolute -right-4 -bottom-4 glass rounded-2xl px-4 py-3 border border-white/10 shadow-xl hidden lg:block">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-white text-xs font-semibold">Accepting New Patients</span>
-                </div>
+            {/* Operating hours pill */}
+            <div className="mt-8 inline-flex items-center gap-3 bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm">
+              <Clock className="w-4 h-4 text-teal-600 shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-slate-800">Open Mon – Sat</p>
+                <p className="text-xs text-slate-500">8:00 AM – 7:00 PM</p>
               </div>
             </div>
           </div>
+
+          {/* Right — cards */}
+          <div
+            className="relative animate-on-scroll space-y-4"
+            style={{ animationDelay: '150ms' }}
+          >
+            {cards.map((card) => {
+              const Icon = card.icon
+              return (
+                <div
+                  key={card.title}
+                  className={`card bg-white p-5 flex items-start gap-4 ${card.border}`}
+                >
+                  <div className={`w-11 h-11 rounded-xl ${card.iconBg} flex items-center justify-center shrink-0`}>
+                    <Icon className={`w-5 h-5 ${card.iconColor}`} />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-base font-bold text-slate-900 mb-1">
+                      {card.title}
+                    </h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                      {card.description}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* Badge */}
+            <div className="hidden lg:flex absolute -bottom-4 -right-4 bg-blue-900 text-white rounded-2xl px-4 py-3 shadow-lg items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+              <span className="text-xs font-semibold">Accepting New Patients</span>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

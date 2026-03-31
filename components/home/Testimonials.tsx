@@ -1,6 +1,6 @@
 'use client'
 
-import { Star } from 'lucide-react'
+import { Star, Quote } from 'lucide-react'
 import { useAnimateOnScroll } from '@/hooks/useAnimateOnScroll'
 
 interface Testimonial {
@@ -9,7 +9,9 @@ interface Testimonial {
   role: string
   text: string
   rating: number
-  avatarGradient: string
+  avatarBg: string
+  avatarText: string
+  treatment: string
 }
 
 const testimonials: Testimonial[] = [
@@ -17,81 +19,75 @@ const testimonials: Testimonial[] = [
     name: 'Sarah M.',
     initials: 'SM',
     role: 'Verified Patient',
-    text: 'Absolutely transformed my confidence. The team is incredibly professional and gentle. Best dental experience I&apos;ve ever had! The whitening results were stunning.',
+    text: 'Absolutely transformed my confidence. The team is incredibly professional and gentle. Best dental experience I\'ve ever had! The whitening results were stunning.',
     rating: 5,
-    avatarGradient: 'from-cyan-400 to-cyan-600',
+    avatarBg: 'bg-blue-100',
+    avatarText: 'text-blue-800',
+    treatment: 'Teeth Whitening',
   },
   {
     name: 'James R.',
     initials: 'JR',
     role: 'Verified Patient',
-    text: 'The teeth whitening results exceeded my expectations. Clean, modern clinic with the latest technology. The staff made the whole process completely painless.',
+    text: 'The dental implant procedure exceeded every expectation. Clean, modern clinic with the latest technology. The staff made the whole process completely painless.',
     rating: 5,
-    avatarGradient: 'from-violet-400 to-violet-600',
+    avatarBg: 'bg-teal-100',
+    avatarText: 'text-teal-800',
+    treatment: 'Dental Implants',
   },
   {
     name: 'Emily K.',
     initials: 'EK',
     role: 'Verified Patient',
-    text: 'I was terrified of dentists until I came here. The staff made me feel so comfortable. My implants look completely natural and the difference in my life is remarkable.',
+    text: 'I was terrified of dentists until I came here. The staff made me feel so comfortable. My implants look completely natural — the difference in my life is remarkable.',
     rating: 5,
-    avatarGradient: 'from-cyan-500 to-violet-500',
+    avatarBg: 'bg-violet-100',
+    avatarText: 'text-violet-800',
+    treatment: 'Orthodontics',
   },
 ]
 
-function TestimonialCard({
-  testimonial,
-  index,
-}: {
-  testimonial: Testimonial
-  index: number
-}) {
+function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; index: number }) {
   return (
     <div
-      className="group relative glass rounded-2xl p-6 border border-white/5 hover:-translate-y-2 transition-all duration-300 overflow-hidden"
-      style={{ animationDelay: `${index * 150}ms` }}
+      className="card p-6 group"
+      style={{ transitionDelay: `${index * 100}ms` }}
     >
-      {/* Hover background */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-cyan-500/5 to-violet-500/5" />
-
-      {/* Opening Quote */}
-      <div className="relative mb-4">
-        <span className="font-display text-6xl font-black leading-none gradient-text opacity-60 select-none">
-          &ldquo;
-        </span>
+      {/* Quote icon */}
+      <div className="mb-4">
+        <Quote className="w-7 h-7 text-blue-200 fill-blue-100" />
       </div>
 
       {/* Stars */}
-      <div className="flex items-center gap-0.5 mb-4">
+      <div className="flex items-center gap-0.5 mb-3">
         {Array.from({ length: testimonial.rating }).map((_, i) => (
           <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
         ))}
       </div>
 
-      {/* Review Text */}
-      <p className="text-white/80 text-sm leading-relaxed mb-6">
+      {/* Treatment tag */}
+      <span className="inline-block text-[10px] font-semibold text-teal-700 bg-teal-50 border border-teal-100 rounded-full px-2.5 py-0.5 mb-3">
+        {testimonial.treatment}
+      </span>
+
+      {/* Review text */}
+      <p className="text-slate-600 text-sm leading-relaxed mb-5">
         {testimonial.text}
       </p>
 
-      {/* Patient Info */}
-      <div className="flex items-center gap-3">
-        {/* Avatar */}
-        <div
-          className={`w-10 h-10 rounded-full bg-gradient-to-br ${testimonial.avatarGradient} flex items-center justify-center shrink-0 shadow-lg`}
-        >
-          <span className="text-white text-xs font-bold">{testimonial.initials}</span>
+      {/* Patient info */}
+      <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
+        <div className={`w-10 h-10 rounded-full ${testimonial.avatarBg} flex items-center justify-center shrink-0`}>
+          <span className={`text-xs font-bold ${testimonial.avatarText}`}>{testimonial.initials}</span>
         </div>
         <div>
-          <p className="text-white font-semibold text-sm">{testimonial.name}</p>
+          <p className="text-slate-900 font-semibold text-sm">{testimonial.name}</p>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+            <div className="w-1.5 h-1.5 rounded-full bg-teal-500" />
             <span className="text-slate-400 text-xs">{testimonial.role}</span>
           </div>
         </div>
       </div>
-
-      {/* Bottom accent */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     </div>
   )
 }
@@ -100,66 +96,56 @@ export default function Testimonials() {
   const sectionRef = useAnimateOnScroll<HTMLElement>({ threshold: 0.05 })
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative py-20 lg:py-28 bg-[#030712] overflow-hidden"
-    >
-      {/* Background blobs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-violet-500/5 blur-[100px] rounded-full" />
-      </div>
+    <section ref={sectionRef} className="py-20 lg:py-28 bg-surface overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {/* Header */}
         <div className="text-center mb-14 animate-on-scroll">
-          <div className="section-badge mb-4">
-            Patient Stories
-          </div>
-          <h2 className="font-display text-4xl lg:text-5xl font-bold text-white mb-4">
+          <div className="section-badge mb-4">Patient Stories</div>
+          <h2 className="font-display text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
             What Our{' '}
-            <span className="gradient-text">Patients Say</span>
+            <span className="text-blue-900">Patients Say</span>
           </h2>
-          <p className="text-slate-400 text-lg max-w-xl mx-auto">
+          <p className="text-slate-500 text-lg max-w-xl mx-auto">
             Don&apos;t take our word for it. Hear directly from the thousands of
             patients who&apos;ve transformed their smiles with Dentify.
           </p>
         </div>
 
-        {/* Testimonials Grid */}
+        {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
           {testimonials.map((testimonial, index) => (
-            <TestimonialCard
-              key={testimonial.name}
-              testimonial={testimonial}
-              index={index}
-            />
+            <TestimonialCard key={testimonial.name} testimonial={testimonial} index={index} />
           ))}
         </div>
 
-        {/* Trust Summary */}
-        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 animate-on-scroll">
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-1">
-              {['from-cyan-400 to-cyan-600', 'from-violet-400 to-violet-600', 'from-cyan-500 to-violet-500'].map(
-                (gradient, i) => (
+        {/* Summary row */}
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-8 animate-on-scroll">
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-2">
+              {['bg-blue-100 text-blue-800', 'bg-teal-100 text-teal-800', 'bg-violet-100 text-violet-800'].map(
+                (cls, i) => (
                   <div
                     key={i}
-                    className={`w-7 h-7 rounded-full bg-gradient-to-br ${gradient} border-2 border-[#030712] flex items-center justify-center`}
+                    className={`w-8 h-8 rounded-full ${cls} border-2 border-white flex items-center justify-center`}
                   >
-                    <span className="text-white text-[9px] font-bold">+</span>
+                    <span className="text-[9px] font-bold">{['SM', 'JR', 'EK'][i]}</span>
                   </div>
                 )
               )}
             </div>
-            <span className="text-slate-400 text-sm">5,000+ happy patients</span>
+            <span className="text-slate-600 text-sm font-medium">8,000+ happy patients</span>
           </div>
+
+          <div className="w-px h-5 bg-slate-200 hidden sm:block" />
+
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-0.5">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
               ))}
             </div>
-            <span className="text-slate-400 text-sm">4.9/5 average rating</span>
+            <span className="text-slate-600 text-sm font-medium">4.9/5 average rating</span>
           </div>
         </div>
       </div>
