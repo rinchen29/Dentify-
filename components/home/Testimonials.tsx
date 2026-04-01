@@ -26,8 +26,8 @@ const testimonials: Testimonial[] = [
     treatment: 'Teeth Whitening',
   },
   {
-    name: 'James R.',
-    initials: 'JR',
+    name: 'Anjali Thapa.',
+    initials: 'AT',
     role: 'Verified Patient',
     text: 'The dental implant procedure exceeded every expectation. Clean, modern clinic with the latest technology. The staff made the whole process completely painless.',
     rating: 5,
@@ -36,8 +36,8 @@ const testimonials: Testimonial[] = [
     treatment: 'Dental Implants',
   },
   {
-    name: 'Emily K.',
-    initials: 'EK',
+    name: 'Sonam Bhutia.',
+    initials: 'SB',
     role: 'Verified Patient',
     text: 'I was terrified of dentists until I came here. The staff made me feel so comfortable. My implants look completely natural — the difference in my life is remarkable.',
     rating: 5,
