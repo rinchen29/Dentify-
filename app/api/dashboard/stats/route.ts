@@ -37,9 +37,9 @@ export async function GET() {
       totalPatients,
       totalAppointments,
       todayAppointments,
-      pendingAppointments,
-      completedAppointments,
-      cancelledAppointments,
+      pendingCount:   pendingAppointments,
+      completedCount: completedAppointments,
+      cancelledCount: cancelledAppointments,
       recentAppointments,
     })
   } catch {
