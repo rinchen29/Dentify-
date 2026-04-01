@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Users, Calendar, CheckCircle, Clock, XCircle, TrendingUp, CalendarDays, RefreshCw } from 'lucide-react'
+import { Users, Calendar, CheckCircle, Clock, XCircle, TrendingUp, CalendarDays, RefreshCw, CalendarCheck } from 'lucide-react'
 
 interface Stats {
   totalPatients: number
   totalAppointments: number
   todayAppointments: number
   pendingCount: number
+  confirmedCount: number
   completedCount: number
   cancelledCount: number
   recentAppointments: {
@@ -53,12 +54,13 @@ export default function DashboardPage() {
   }
 
   const cards = [
-    { label: 'Total Patients',       value: stats.totalPatients,      icon: Users,        iconBg: 'bg-blue-50',   iconColor: 'text-blue-700',   numColor: 'text-blue-900',   href: '/dashboard/patients' },
-    { label: 'Total Appointments',   value: stats.totalAppointments,  icon: Calendar,     iconBg: 'bg-teal-50',   iconColor: 'text-teal-600',   numColor: 'text-teal-700',   href: '/dashboard/appointments' },
-    { label: "Today's Appointments", value: stats.todayAppointments,  icon: CalendarDays, iconBg: 'bg-violet-50', iconColor: 'text-violet-600', numColor: 'text-violet-700', href: '/dashboard/appointments' },
-    { label: 'Pending Review',       value: stats.pendingCount,       icon: Clock,        iconBg: 'bg-amber-50',  iconColor: 'text-amber-600',  numColor: 'text-amber-700',  href: '/dashboard/appointments' },
-    { label: 'Completed',            value: stats.completedCount,     icon: CheckCircle,  iconBg: 'bg-teal-50',   iconColor: 'text-teal-600',   numColor: 'text-teal-700',   href: '/dashboard/appointments' },
-    { label: 'Cancelled',            value: stats.cancelledCount,     icon: XCircle,      iconBg: 'bg-rose-50',   iconColor: 'text-rose-600',   numColor: 'text-rose-700',   href: '/dashboard/appointments' },
+    { label: 'Total Patients',       value: stats.totalPatients      ?? 0, icon: Users,        iconBg: 'bg-blue-50',   iconColor: 'text-blue-700',   numColor: 'text-blue-900',   href: '/dashboard/patients' },
+    { label: 'Total Appointments',   value: stats.totalAppointments  ?? 0, icon: Calendar,     iconBg: 'bg-teal-50',   iconColor: 'text-teal-600',   numColor: 'text-teal-700',   href: '/dashboard/appointments' },
+    { label: "Today's Appointments", value: stats.todayAppointments  ?? 0, icon: CalendarDays, iconBg: 'bg-violet-50', iconColor: 'text-violet-600', numColor: 'text-violet-700', href: '/dashboard/appointments' },
+    { label: 'Pending',              value: stats.pendingCount       ?? 0, icon: Clock,        iconBg: 'bg-amber-50',  iconColor: 'text-amber-600',  numColor: 'text-amber-700',  href: '/dashboard/appointments' },
+    { label: 'Confirmed',            value: stats.confirmedCount     ?? 0, icon: CalendarCheck,iconBg: 'bg-blue-50',   iconColor: 'text-blue-600',   numColor: 'text-blue-700',   href: '/dashboard/appointments' },
+    { label: 'Completed',            value: stats.completedCount     ?? 0, icon: CheckCircle,  iconBg: 'bg-teal-50',   iconColor: 'text-teal-600',   numColor: 'text-teal-700',   href: '/dashboard/appointments' },
+    { label: 'Cancelled',            value: stats.cancelledCount     ?? 0, icon: XCircle,      iconBg: 'bg-rose-50',   iconColor: 'text-rose-600',   numColor: 'text-rose-700',   href: '/dashboard/appointments' },
   ]
 
   return (
@@ -75,7 +77,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map(({ label, value, icon: Icon, iconBg, iconColor, numColor, href }) => (
           <a key={label} href={href} className="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4 hover:border-blue-200 hover:shadow-sm transition-all">
             <div className={`w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center shrink-0`}>

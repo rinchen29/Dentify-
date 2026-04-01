@@ -27,7 +27,6 @@ export async function GET() {
       prisma.appointment.count({ where: { status: 'CANCELLED' } }),
       prisma.appointment.findMany({
         take: 5,
-        where: { status: { not: 'CANCELLED' } },
         orderBy: { createdAt: 'desc' },
         include: {
           patient: { select: { name: true, email: true } },
