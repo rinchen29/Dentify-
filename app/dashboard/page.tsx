@@ -36,7 +36,7 @@ export default function DashboardPage() {
     try {
       const res = await fetch('/api/dashboard/stats')
       const data = await res.json()
-      setStats(data)
+      if (!data.error) setStats(data)
     } finally {
       setLoading(false)
     }

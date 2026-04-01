@@ -8,6 +8,7 @@ interface Stats {
   totalAppointments: number
   todayAppointments: number
   pendingCount: number
+  confirmedCount: number
   completedCount: number
   cancelledCount: number
   recentAppointments: {
@@ -34,7 +35,7 @@ export default function AnalyticsPage() {
   useEffect(() => {
     fetch('/api/dashboard/stats')
       .then((r) => r.json())
-      .then(setStats)
+      .then((data) => { if (!data.error) setStats(data) })
       .finally(() => setLoading(false))
   }, [])
 
@@ -48,19 +49,15 @@ export default function AnalyticsPage() {
 
   if (!stats) return null
 
-  const confirmedCount = stats.totalAppointments - stats.pendingCount - stats.completedCount - stats.cancelledCount
-  const completionRate = stats.totalAppointments > 0
-    ? Math.round((stats.completedCount / stats.totalAppointments) * 100)
-    : 0
-  const cancellationRate = stats.totalAppointments > 0
-    ? Math.round((stats.cancelledCount / stats.totalAppointments) * 100)
-    : 0
+  const total = stats.totalAppointments || 0
+  const completionRate  = total > 0 ? Math.round((stats.completedCount  / total) * 100) : 0
+  const cancellationRate = total > 0 ? Math.round((stats.cancelledCount / total) * 100) : 0
 
   const statusBreakdown = [
-    { label: 'Pending',   count: stats.pendingCount,   icon: Clock,        color: 'text-amber-600', bg: 'bg-amber-50',  bar: 'bg-amber-400' },
-    { label: 'Confirmed', count: confirmedCount,        icon: Calendar,     color: 'text-blue-600',  bg: 'bg-blue-50',   bar: 'bg-blue-500' },
-    { label: 'Completed', count: stats.completedCount,  icon: CheckCircle,  color: 'text-teal-600',  bg: 'bg-teal-50',   bar: 'bg-teal-500' },
-    { label: 'Cancelled', count: stats.cancelledCount,  icon: XCircle,      color: 'text-rose-600',  bg: 'bg-rose-50',   bar: 'bg-rose-400' },
+    { label: 'Pending',   count: stats.pendingCount   ?? 0, icon: Clock,        color: 'text-amber-600', bg: 'bg-amber-50',  bar: 'bg-amber-400' },
+    { label: 'Confirmed', count: stats.confirmedCount ?? 0, icon: Calendar,     color: 'text-blue-600',  bg: 'bg-blue-50',   bar: 'bg-blue-500' },
+    { label: 'Completed', count: stats.completedCount ?? 0, icon: CheckCircle,  color: 'text-teal-600',  bg: 'bg-teal-50',   bar: 'bg-teal-500' },
+    { label: 'Cancelled', count: stats.cancelledCount ?? 0, icon: XCircle,      color: 'text-rose-600',  bg: 'bg-rose-50',   bar: 'bg-rose-400' },
   ]
 
   return (
