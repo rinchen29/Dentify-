@@ -165,7 +165,7 @@ function Step1Service({
                   <Clock className="w-3 h-3 text-slate-400" />
                   <span className="text-slate-400 text-xs">{service.duration}</span>
                   {service.price && (
-                    <span className="text-slate-400 text-xs ml-2">· ${service.price.toLocaleString()}</span>
+                    <span className="text-slate-400 text-xs ml-2">· ₹{service.price.toLocaleString()}</span>
                   )}
                 </div>
               </div>
@@ -333,7 +333,7 @@ function Step3Details({
             <Phone className="w-3.5 h-3.5 text-blue-700" />
             Phone Number <span className="text-rose-500">*</span>
           </label>
-          <input type="tel" required value={data.phone} onChange={(e) => onChange('phone', e.target.value)} placeholder="+1 (555) 000-0000" className={inputClass} />
+          <input type="tel" required value={data.phone} onChange={(e) => onChange('phone', e.target.value)} placeholder="+91 XXXXX XXXXX" className={inputClass} />
         </div>
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-1.5">
