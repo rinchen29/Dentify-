@@ -76,8 +76,8 @@ export default function AnalyticsPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Patients',      value: stats.totalPatients,      icon: Users,        bg: 'bg-blue-50',   color: 'text-blue-700',   num: 'text-blue-900' },
-          { label: 'Total Appointments',  value: stats.totalAppointments,  icon: Calendar,     bg: 'bg-teal-50',   color: 'text-teal-600',   num: 'text-teal-800' },
+          { label: 'Total Patients',      value: stats.totalPatients      ?? 0, icon: Users,        bg: 'bg-blue-50',   color: 'text-blue-700',   num: 'text-blue-900' },
+          { label: 'Total Appointments',  value: stats.totalAppointments  ?? 0, icon: Calendar,     bg: 'bg-teal-50',   color: 'text-teal-600',   num: 'text-teal-800' },
           { label: 'Completion Rate',     value: `${completionRate}%`,     icon: TrendingUp,   bg: 'bg-violet-50', color: 'text-violet-600', num: 'text-violet-800' },
           { label: 'Cancellation Rate',   value: `${cancellationRate}%`,   icon: XCircle,      bg: 'bg-rose-50',   color: 'text-rose-500',   num: 'text-rose-700' },
         ].map(({ label, value, icon: Icon, bg, color, num }) => (
@@ -102,7 +102,7 @@ export default function AnalyticsPage() {
           </h2>
           <div className="space-y-4">
             {statusBreakdown.map(({ label, count, icon: Icon, color, bg, bar }) => {
-              const pct = stats.totalAppointments > 0 ? (count / stats.totalAppointments) * 100 : 0
+              const pct = total > 0 ? (count / total) * 100 : 0
               return (
                 <div key={label}>
                   <div className="flex items-center justify-between mb-1.5">

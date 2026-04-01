@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import {
   Calendar, Search, Filter, ChevronDown,
   CheckCircle, XCircle, Clock, RefreshCw,
-  Plus, X, Phone, Mail, FileText, User, Loader2,
+  Plus, X, Phone, Mail, FileText, User, Loader2, Trash2,
 } from 'lucide-react'
 
 interface Appointment {
@@ -43,6 +43,7 @@ export default function AppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState('')
   const [search, setSearch] = useState('')
   const [updating, setUpdating] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
   // New appointment modal
@@ -109,6 +110,14 @@ export default function AppointmentsPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const deleteAppointment = async (id: string) => {
+    if (!confirm('Delete this appointment? This cannot be undone.')) return
+    setDeleting(id)
+    await fetch(`/api/appointments/${id}`, { method: 'DELETE' })
+    await fetchAppointments()
+    setDeleting(null)
   }
 
   const filtered = appointments.filter((a) => {
@@ -250,6 +259,13 @@ export default function AppointmentsPage() {
                           )}
                           {appt.status === 'COMPLETED' && <CheckCircle className="w-4 h-4 text-teal-400" />}
                           {appt.status === 'CANCELLED' && <XCircle className="w-4 h-4 text-slate-300" />}
+                          <button
+                            onClick={() => deleteAppointment(appt.id)}
+                            disabled={deleting === appt.id}
+                            className="p-1.5 rounded-lg bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors disabled:opacity-50"
+                          >
+                            {deleting === appt.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                          </button>
                         </div>
                       </td>
                     </tr>
