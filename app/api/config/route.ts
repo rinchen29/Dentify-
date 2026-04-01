@@ -12,8 +12,9 @@ export async function GET() {
   try {
     const config = await getOrCreateConfig()
     return NextResponse.json({ config })
-  } catch {
-    return NextResponse.json({ error: 'Failed to fetch config' }, { status: 500 })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: 'Failed to fetch config', detail: message }, { status: 500 })
   }
 }
 
